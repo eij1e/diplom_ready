@@ -1,11 +1,5 @@
-import os
 import webbrowser
-import subprocess
-import dearpygui.dearpygui as dpg
 from core.pipeline_runner import run_pipeline
-import socket
-import subprocess
-import os
 
 import socket
 import subprocess

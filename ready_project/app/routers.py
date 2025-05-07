@@ -38,6 +38,21 @@ def index(request: Request, version: str = "", db: Session = Depends(get_db)):
         "selected_version": version
     })
 
+# --- Обновление ручной разметки (плагиат/не плагиат) ---
+@router.post("/update_labels")
+async def update_labels(request: Request, db: Session = Depends(get_db)):
+    form = await request.form()
+    all_ids = db.query(ComparisonResult.id).all()
+    all_ids_set = {str(id_) for (id_,) in all_ids}
+
+    for id_str in all_ids_set:
+        checkbox_name = f"plagiarism_{id_str}"
+        record = db.query(ComparisonResult).filter(ComparisonResult.id == int(id_str)).first()
+        if record:
+            record.is_plagiarism = checkbox_name in form
+
+    db.commit()
+    return RedirectResponse(url="/", status_code=303)
 
 # === Страница управления версиями ===
 @router.get("/versions")
@@ -67,7 +82,7 @@ def delete_version(version: str = Form(...), db: Session = Depends(get_db)):
 
     return RedirectResponse(url="/versions", status_code=303)
 
-
+# === Статистика ===
 @router.get("/stats")
 def stats_page(request: Request, db: Session = Depends(get_db)):
     stats = db.query(Statistics).order_by(Statistics.version.desc()).all()

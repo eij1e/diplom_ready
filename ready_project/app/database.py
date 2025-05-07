@@ -1,5 +1,5 @@
 import os
-from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime
+from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, Boolean
 from sqlalchemy.orm import sessionmaker, declarative_base
 from datetime import datetime
 
@@ -21,6 +21,7 @@ class ComparisonResult(Base):
     image_path = Column(String)
     version = Column(String, default="1.0.0")
     created_at = Column(DateTime, default=datetime.utcnow)
+    is_plagiarism = Column(Boolean, default=False)
 
 class VersionInfo(Base):
     __tablename__ = "version_info"
