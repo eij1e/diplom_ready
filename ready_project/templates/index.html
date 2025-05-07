@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Сравнение графов</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <style>
+        img.preview-thumb {
+            max-width: 120px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            transition: transform 0.2s ease;
+        }
+
+        img.preview-thumb:hover {
+            transform: scale(1.05);
+            cursor: pointer;
+        }
+
+        #version-filter {
+            width: auto;
+            display: inline-block;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+<div class="container mt-5">
+    <h1 class="mb-4">Сравнение графов</h1>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <a href="/stats" class="btn btn-primary">📊 Перейти к статистике</a>
+            <a href="/versions" class="btn btn-secondary">Управление версиями</a>
+        </div>
+        <div>
+            <label for="version-filter" class="form-label me-2">Фильтр по версии:</label>
+            <select id="version-filter" class="form-select">
+                <option value="">Все версии</option>
+                {% set versions = comparisons | map(attribute='version') | unique | list %}
+                {% for version in versions %}
+                    <option value="{{ version }}">{{ version }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <table id="comparison-table" class="table table-bordered table-striped table-hover align-middle">
+        <thead class="table-dark">
+        <tr>
+            <th>Graph A</th>
+            <th>Graph B</th>
+            <th>Версия</th>
+            <th>Дата</th>
+            <th>RANSAC</th>
+            <th>GCN</th>
+            <th>GIN</th>
+            <th>Изображение</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for row in comparisons %}
+            <tr>
+                <td>{{ row.graph_a }}</td>
+                <td>{{ row.graph_b }}</td>
+                <td>{{ row.version }}</td>
+                <td>{{ row.created_at.strftime("%Y-%m-%d %H:%M:%S") }}</td>
+                <td>{{ "%.3f"|format(row.ransac_predict or 0.0) }}</td>
+                <td>{{ row.gcn_predict }}</td>
+                <td>{{ row.gin_predict }}</td>
+                <td>
+                    {% if row.image_path %}
+                        <a href="{{ row.image_path.replace('\\', '/').replace('static/', '/static/') }}" target="_blank">
+                            <img src="{{ row.image_path.replace('\\', '/').replace('static/', '/static/') }}" alt="Сравнение" class="preview-thumb">
+                        </a>
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    $(document).ready(function () {
+        var table = $('#comparison-table').DataTable({
+            pageLength: 50,
+            responsive: true
+        });
+
+        $('#version-filter').on('change', function () {
+            table.column(2).search(this.value).draw();
+        });
+    });
+</script>
+
+</body>
+</html>
