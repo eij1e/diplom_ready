@@ -5,36 +5,52 @@
 ## 📁 Структура проекта
 
 ```plaintext
-project-root/
-├── app/                          # Веб-интерфейс на FastAPI
-│   ├── main.py                   # Точка входа для запуска веб-сервера
-│   ├── database.py               # Работа с SQLite: результаты, версии и разметка
-│   └── templates/                # HTML-шаблоны: index.html, stats.html и др.
+ready_project/
 │
-├── core/                         # Основная логика обработки и сравнения
-│   ├── convert_dxf_graphs.py     # Преобразование DXF-файлов в графы
-│   ├── comparer_graphs.py        # Сравнение графов, применение RANSAC, визуализация
-│   ├── statistics.py             # Подсчёт метрик и построение гистограмм
-│   └── pipeline_runner.py        # Полный пайплайн сравнения DXF-файлов
+├── desktop_interface.py         # Десктопный интерфейс (DearPyGUI)
+├── requirements.txt             # Зависимости проекта
+├── README.md                    # Документация
 │
-├── models/                       # Папка с сохранёнными нейросетевыми моделями
+├── app/                         # Web-интерфейс на FastAPI
+│   ├── main.py                  # Точка входа
+│   ├── database.py              # Работа с базой данных (SQLite)
+│   └── routers.py               # Роутинг (загрузка, сравнение, просмотр)
+│
+├── core/                        # Логика сравнения и пайплайн
+│   ├── pipeline_runner.py       # Основной пайплайн сравнения
+│   ├── comparer_graphs.py       # Сравнение графов (RANSAC, GCN, GIN)
+│   ├── convert_dxf_graphs.py    # Парсинг DXF → графы
+│   ├── statistics_utils.py      # Подсчёт и логирование метрик
+│   └── models.py                # Вспомогательные структуры данных
+│
+├── data/                        # Датасет (DXF-файлы, графы, веса)
+│   ├── comparisons.db           # SQLite база с результатами
+│   └── [v1_0_x]/                # Папки версий: dxf, pkl, pt-файлы
+│       ├── dxf/                 # Исходные чертежи
+│       ├── pkl/                 # Графы в формате pickle
+│       └── pt/                  # Графы в формате PyTorch для обучения
+│
+├── models/                      # Обученные модели
 │   ├── best_model_gcn.pt
 │   └── best_model_gin.pt
 │
-├── train_binary_classifier_27_04/
-│   ├── gcn_gin_training.py       # Обучение GCN и GIN
-│   └── grid_search.py            # Подбор гиперпараметров
+├── scripts/                     # Утилиты и тестовые пайплайны
+│   ├── generate_png.py          # Генерация PNG-сравнений
+│   ├── test_pipeline.py         # Быстрый запуск пайплайна
+│   └── test/                    # Тестовые графы (pkl/pt)
 │
-├── static/
-│   ├── images/                   # Визуализация совпадений графов
-│   └── histograms/               # Гистограммы по метрикам сравнения
+├── static/                      # Статические файлы
+│   ├── fonts/                   # Шрифты для UI
+│   └── histograms/              # Гистограммы статистики
 │
-├── data/                         # Версионные данные: вход, выход, промежуточные файлы
-│   └── 1_0_0/
-│       ├── dxf/
-│       ├── pkl/
-│       └── pt/
+├── templates/                   # HTML-шаблоны Jinja2
+│   ├── index.html
+│   ├── stats.html
+│   └── versions.html
 │
-├── desktop_interface.py          # Десктопный интерфейс (DearPyGUI)
-├── README.md                     # Описание проекта
-└── requirements.txt              # Зависимости проекта
+└── test/                        # Тестовые скрипты и визуализация
+    ├── check_db.py              # Проверка базы
+    ├── delete_rows.py           # Очистка данных
+    ├── interface_test.py        # Проверка интерфейса
+    ├── test_ransac_visualization.py
+    └── ransac_image/            # Картинки RANSAC и отладка
